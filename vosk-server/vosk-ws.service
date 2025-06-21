@@ -1,0 +1,14 @@
+[Unit]
+Description=Vosk Websocket Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=rosko
+ExecStart=/usr/bin/env python3.9 /home/rosko/vosk/vosk-server/websocket/asr_server.py /home/rosko/vosk/vosk-models/vsk-small/
+
+[Install]
+WantedBy=multi-user.target
