@@ -52,14 +52,15 @@ install_all:      install_python_only install_vosk_only install_eff_word_only
 install_zerotier:
 	curl -s  https://install.zerotier.com  | sudo bash
 
-setup_service: create_service_file
+setup_service: create_settings_file create_service_file
 	[[ -d ~/.local/share/vosk ]] || mkdir -p ~/.local/share/vosk
 	cp vosk-server/server.py ~/.local/share/vosk
-	cp vosk-server/server_settings.json ~/.local/share/vosk
+	# cp vosk-server/server_settings.json ~/.local/share/vosk
 	sudo cp vosk-server/vosk-ws.service /etc/systemd/system/vosk-ws.service
 	sudo chmod 644 /etc/systemd/system/vosk-ws.service
 	sudo systemctl start vosk-ws
 	sudo systemctl enable vosk-ws.service
+
 
 create_service_file:
 	@echo -e "[Unit]\
@@ -76,3 +77,11 @@ create_service_file:
 \n	\
 \n[Install] \
 \nWantedBy=multi-user.target" > vosk-server/vosk-ws.service
+create_settings_file:
+	[[ -d ~/.local/share/vosk ]] || mkdir -p ~/.local/share/vosk
+	@echo -e "{\
+\n        \"modelpath\": \"$(HOME)/.local/share/vosk/models/vosk-model-small-en-us-0.15\" , \
+\n        \"port\": 2700, \
+\n        \"sample_rate\": 8000, \
+\n        \"spkmodel\": \"\" \
+\n}" > $(HOME)/.local/share/vosk/server_settings.json

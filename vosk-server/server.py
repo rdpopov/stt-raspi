@@ -84,7 +84,7 @@ async def start():
 
     settings_file = pathlib.Path(__file__).parent / 'server_settings.json'
     settings = json.load(open(settings_file)) if settings_file.exists() else {
-            "modelpath": "",
+            "modelpath": str(pathlib.Path(__file__).parent / 'model') ,
             "port": 2700,
             "sample_rate": 8000,
             "spkmodel": "",
