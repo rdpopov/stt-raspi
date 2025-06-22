@@ -8,6 +8,7 @@ import pathlib
 import websockets
 import concurrent.futures
 import logging
+import pathlib
 from vosk import Model, SpkModel, KaldiRecognizer
 
 def process_chunk(rec, message):
@@ -81,28 +82,27 @@ async def start():
     global args
     global pool
 
+    settings_file = pathlib.Path(__file__).parent / 'server_settings.json'
+    settings = json.load(open(settings_file)) if settings_file.exists() else {
+            "modelpath": "",
+            "port": 2700,
+            "sample_rate": 8000,
+            "spkmodel": "",
+    }
+
+    assert settings['modelpath'] != "", "Model path is not set in server_settings.json"
+
     logging.basicConfig(level=logging.INFO)
 
     args = type('', (), {})()
 
-    args.interface = os.environ.get('VOSK_SERVER_INTERFACE', '0.0.0.0')
-    args.port = int(os.environ.get('VOSK_SERVER_PORT', 2700))
-    args.model_path = os.environ.get('VOSK_MODEL_PATH', 'model')
-    args.spk_model_path = os.environ.get('VOSK_SPK_MODEL_PATH')
-    args.sample_rate = float(os.environ.get('VOSK_SAMPLE_RATE', 8000))
+    args.interface = '0.0.0.0'
+    args.port = int(settings.get('port', 2700))
+    args.model_path = settings['modelpath']
+    args.spk_model_path = settings['spkmodel']
+    args.sample_rate = float(settings.get('sample_rate', 8000))
     args.max_alternatives = int(os.environ.get('VOSK_ALTERNATIVES', 0))
     args.show_words = bool(os.environ.get('VOSK_SHOW_WORDS', True))
-
-    if len(sys.argv) > 1:
-       args.model_path = sys.argv[1]
-
-    # Gpu part, uncomment if vosk-api has gpu support
-    #
-    # from vosk import GpuInit, GpuInstantiate
-    # GpuInit()
-    # def thread_init():
-    #     GpuInstantiate()
-    # pool = concurrent.futures.ThreadPoolExecutor(initializer=thread_init)
 
     model = Model(args.model_path)
     spk_model = SpkModel(args.spk_model_path) if args.spk_model_path else None
@@ -111,7 +111,6 @@ async def start():
 
     async with websockets.serve(recognize, args.interface, args.port):
         await asyncio.Future()
-
 
 if __name__ == '__main__':
     asyncio.run(start())

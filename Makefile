@@ -52,7 +52,7 @@ install_all:      install_python_only install_vosk_only install_eff_word_only
 install_zerotier:
 	curl -s  https://install.zerotier.com  | sudo bash
 
-setup_service:
+setup_service: create_service_file
 	[[ -d ~/.local/share/vosk ]] || mkdir -p ~/.local/share/vosk
 	cp vosk-server/server.py ~/.local/share/vosk
 	cp vosk-server/server_settings.json ~/.local/share/vosk
@@ -60,3 +60,19 @@ setup_service:
 	sudo chmod 644 /etc/systemd/system/vosk-ws.service
 	sudo systemctl start vosk-ws
 	sudo systemctl enable vosk-ws.service
+
+create_service_file:
+	@echo -e "[Unit]\
+\nDescription=Vosk Websocket Server \
+\nAfter=network.target \
+\nStartLimitIntervalSec=0 \
+\n	\
+\n[Service]  \
+\nType=simple  \
+\nRestart=always  \
+\nRestartSec=1  \
+\nUser=$(USER)  \
+\nExecStart=/usr/bin/env python3.9 $(HOME)/.local/share/vosk/server.py \
+\n	\
+\n[Install] \
+\nWantedBy=multi-user.target" > vosk-server/vosk-ws.service
