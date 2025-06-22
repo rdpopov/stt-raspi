@@ -86,7 +86,7 @@ async def start():
     settings = json.load(open(settings_file)) if settings_file.exists() else {
             "modelpath": str(pathlib.Path(__file__).parent / 'model') ,
             "port": 2700,
-            "sample_rate": 8000,
+            "sample_rate": 16000,
             "spkmodel": "",
     }
 
@@ -100,7 +100,7 @@ async def start():
     args.port = int(settings.get('port', 2700))
     args.model_path = settings['modelpath']
     args.spk_model_path = settings['spkmodel']
-    args.sample_rate = float(settings.get('sample_rate', 8000))
+    args.sample_rate = float(settings.get('sample_rate', 16000))
     args.max_alternatives = int(os.environ.get('VOSK_ALTERNATIVES', 0))
     args.show_words = bool(os.environ.get('VOSK_SHOW_WORDS', True))
 

@@ -1,6 +1,6 @@
 { "modelpath": "~/.local/share/vosk/models/vosk-model-small-en-us-0.15",
     "port": 2700,
-    "sample_rate": 8000,
+    "sample_rate": 16000,
     "spkmodel": ""
 }
 
