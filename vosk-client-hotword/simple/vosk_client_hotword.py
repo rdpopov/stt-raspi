@@ -58,7 +58,8 @@ async def listen_and_transcribe(duration=5):
         parse_once = False
         parse_args()
 
-    print("recording : ... ")
+    if int(settings.get('debug',0)) == 1 : 
+        print("recording : ... ")
     with sd.RawInputStream(samplerate=settings.get("samplerate",16000),
                            blocksize = 4000, device=args.device, dtype='int16',
                            channels=1, callback=callback_vosk) as device:
