@@ -96,6 +96,8 @@ def parse_args():
     global loop
     global audio_queue
     parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('-l', '--list-devices', action='store_true',
+                        help='show list of audio devices and exit')
     args, remaining = parser.parse_known_args()
     if args.list_devices:
         print(sd.query_devices())
