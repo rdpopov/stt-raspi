@@ -98,7 +98,7 @@ async def start():
 
     args.interface = '0.0.0.0'
     args.port = int(settings.get('port', 2700))
-    args.model_path = settings['modelpath']
+    args.model_path = os.path.expanduser(settings['modelpath'])
     args.spk_model_path = settings['spkmodel']
     args.sample_rate = float(settings.get('sample_rate', 16000))
     args.max_alternatives = int(os.environ.get('VOSK_ALTERNATIVES', 0))
