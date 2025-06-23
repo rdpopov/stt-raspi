@@ -84,12 +84,9 @@ async def listen_and_transcribe(duration=5):
 
             await websocket.send('{"eof" : 1}')
             #print(await websocket.recv())
-    if settings.get("debug", False):
+    if int(settings.get('debug',0)) == 1 : 
         print("stopped recording")
 
-
-
-print("Say Mycroft ")
 
 def parse_args():
 
@@ -98,8 +95,6 @@ def parse_args():
     global loop
     global audio_queue
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('-l', '--list-devices', action='store_true',
-                        help='show list of audio devices and exit')
     args, remaining = parser.parse_known_args()
     if args.list_devices:
         print(sd.query_devices())
@@ -107,11 +102,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="ASR Server",
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      parents=[parser])
-    parser.add_argument('-u', '--uri', type=str, metavar='URL',
-                        help='Server URL', default='ws://localhost:2700')
     parser.add_argument('-d', '--device', type=int_or_str,
                         help='input device (numeric ID or substring)')
-    parser.add_argument('-r', '--samplerate', type=int, help='sampling rate', default=16000)
     args = parser.parse_args(remaining)
     audio_queue = asyncio.Queue()
     logging.basicConfig(level=logging.INFO)
@@ -123,7 +115,7 @@ async def main():
     global settings
     settings_file = pathlib.Path(__file__).parent / 'client_settings.json'
     settings = json.load(open(settings_file)) if settings_file.exists() else {
-            "debug" : true,
+            "debug" : 0,
             "hotword_threshold" : 0.6,
             "relaxation_time" : 2,
             "hotword" : "mycroft",
@@ -132,13 +124,18 @@ async def main():
             "sample_rate_to_server" : 16000,
     }
 
-    mycroft_hw = HotwordDetector(
-            hotword=settings.get("hotword", "mycroft"),
-            model = base_model,
-            reference_file=settings.get("hotword_refference_file", os.path.join(samples_loc, "mycroft_ref.json")),
-            threshold=float(settings.get("hotword_threshold", 0.6)),
-            relaxation_time=int(settings.get("relaxation_time", 2)),
-            )
+
+
+    if int(settings.get('debug',0)) == 1 : 
+        print("Say",settings.get("hotword", "mycroft")) 
+
+    mycroft_hw = HotwordDetector( 
+                                 hotword=settings.get("hotword", "mycroft"), 
+                                 model = base_model, 
+                                 reference_file= os.path.expanduser(settings.get("hotword_refference_file", os.path.join(samples_loc, "mycroft_ref.json"))),
+                                 threshold=float(settings.get("hotword_threshold", 0.6)),
+                                 relaxation_time=int(settings.get("relaxation_time", 2)),
+                                 )
 
     mic_stream = SimpleMicStream(
             window_length_secs = 1.5, # these are ratios for that depend on constants internally so no config othewise the buffers break since sizes are kinda hradcoded 
@@ -153,7 +150,7 @@ async def main():
             #no voice activity
             continue
         if(result["match"]):
-            if settings["debug"]:
+            if int(settings.get('debug',0)) == 1 : 
                 print("Wakeword uttered",result["confidence"])
             await listen_and_transcribe()
 

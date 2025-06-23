@@ -1,5 +1,5 @@
 {
-    "debug" : true,
+    "debug" : 0,
     "hotword_threshold" : 0.6,
     "relaxation_time" : 2,
     "hotword" : "mycroft",
