@@ -8,14 +8,11 @@ import sounddevice as sd
 import sys
 import websockets
 import time
-from eff_word_net.streams import SimpleMicStream
-from eff_word_net.engine import HotwordDetector
-from eff_word_net import samples_loc
 from eff_word_net.audio_processing import Resnet50_Arc_loss
-from vosk import Model, KaldiRecognizer
-from eff_word_net.streams import SimpleMicStream
 from eff_word_net.engine import HotwordDetector
 from eff_word_net import samples_loc
+from eff_word_net.streams import SimpleMicStream
+from vosk import Model, KaldiRecognizer
 
 q = queue.Queue()
 
@@ -54,20 +51,22 @@ async def listen_and_transcribe(duration=5):
     global args
     global loop
     global audio_queue
+    global settings
     loop = asyncio.get_running_loop()
     if parse_once:
         parse_once = False
         parse_args()
 
     print("recording : ... ")
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 4000, device=args.device, dtype='int16',
+    with sd.RawInputStream(samplerate=settings.get("samplerate",16000),
+                           blocksize = 4000, device=args.device, dtype='int16',
                            channels=1, callback=callback_vosk) as device:
 
         start = time.time()
         last_partial = time.time()
         had_any_text = False
 
-        async with websockets.connect(args.uri) as websocket:
+        async with websockets.connect(settings.get("server", "ws://localhost:2700") as websocket:
             await websocket.send('{ "config" : { "sample_rate" : %d } }' % (device.samplerate))
             while time.time() - start < duration or (had_any_text  and time.time() - last_partial < 5) :
                 data = await audio_queue.get()
@@ -85,7 +84,8 @@ async def listen_and_transcribe(duration=5):
 
             await websocket.send('{"eof" : 1}')
             #print(await websocket.recv())
-    print("stopped recording")
+    if settings.get("debug", False):
+        print("stopped recording")
 
 
 
@@ -120,16 +120,28 @@ async def main():
 
     base_model = Resnet50_Arc_loss()
 
+    global settings
+    settings_file = pathlib.Path(__file__).parent / 'client_settings.json'
+    settings = json.load(open(settings_file)) if settings_file.exists() else {
+            "debug" : true,
+            "hotword_threshold" : 0.6,
+            "relaxation_time" : 2,
+            "hotword" : "mycroft",
+            "hotword_refference_file" : "~/.local/lib/python3.9/site-packages/eff_word_net/sample_refs/mycroft_ref.json",
+            "server" : "ws://localhost:2700",
+            "sample_rate_to_server" : 16000,
+    }
+
     mycroft_hw = HotwordDetector(
-            hotword="mycroft",
+            hotword=settings.get("hotword", "mycroft"),
             model = base_model,
-            reference_file=os.path.join(samples_loc, "mycroft_ref.json"),
-            threshold=0.6,
-            relaxation_time=2
+            reference_file=settings.get("hotword_refference_file", os.path.join(samples_loc, "mycroft_ref.json")),
+            threshold=float(settings.get("hotword_threshold", 0.6)),
+            relaxation_time=int(settings.get("relaxation_time", 2)),
             )
 
     mic_stream = SimpleMicStream(
-            window_length_secs = 1.5,
+            window_length_secs = 1.5, # these are ratios for that depend on constants internally so no config othewise the buffers break since sizes are kinda hradcoded 
             sliding_window_secs=0.75
             )
     mic_stream.start_stream()
@@ -141,7 +153,8 @@ async def main():
             #no voice activity
             continue
         if(result["match"]):
-            print("Wakeword uttered",result["confidence"])
+            if settings["debug"]:
+                print("Wakeword uttered",result["confidence"])
             await listen_and_transcribe()
 
 if __name__ == '__main__':
