@@ -1,9 +1,11 @@
 {
-    "debug" : 0,
-    "hotword_threshold" : 0.6,
+    "debug" : 1,
+    "hotword_threshold" : 0.5,
     "relaxation_time" : 2,
-    "hotword" : "mycroft",
-    "hotword_refference_file" : "~/.local/lib/python3.9/site-packages/eff_word_net/sample_refs/mycroft_ref.json",
+    "hotword" : "rosko",
+    "hotword_refference_file" : "/home/pi/stt-raspi/vosk-client-hotword/custom-word/out/rosko_ref.json",
     "server" : "ws://localhost:2700",
     "sample_rate_to_server" : 16000
 }
+
+

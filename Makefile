@@ -36,7 +36,7 @@ install_eff_word_only:
 	sudo apt -y install portaudio19-dev libalsaplayer0 libalsaplayer-dev
 	pip3.9 install wheel
 	pip3.9 install pyaudio
-	pip3.9 install sounddevice
+	pip3.9 install sounddevice typer
 	pip3.9 install tflite tflite-runtime
 	pip3.9 install EfficientWord-Net
 	# Quick Fix for EfficientWord-Net error
