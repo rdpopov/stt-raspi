@@ -125,11 +125,12 @@ There isnt really an ideal wake wort detection solution. It either
 #### EfficientWord-Net setup
   - Install EfficientWord-Net
 ```bash
-  sudo apt install portaudio19-dev # needed for pyaudio
-  pip3.9 install wheel
-  pip3.9 install pyaudio
-  pip3.9 install tflite tflite-runtime
-  pip3.9 install EfficientWord-Net
+	sudo apt -y install portaudio19-dev libalsaplayer0 libalsaplayer-dev
+	pip3.9 install wheel
+	pip3.9 install pyaudio
+	pip3.9 install sounddevice typer
+	pip3.9 install tflite tflite-runtime
+	pip3.9 install EfficientWord-Net
 ```
 - Currently might require a modification to the source code, that causes it to
   error otherwise. The issue is from last year, but has not been adressed yet.
