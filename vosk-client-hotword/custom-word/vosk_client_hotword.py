@@ -66,7 +66,7 @@ async def listen_and_transcribe(duration=5):
         last_partial = time.time()
         had_any_text = False
 
-        async with websockets.connect(settings.get("server", "ws://localhost:2700") as websocket:
+        async with websockets.connect(settings.get("server", "ws://localhost:2700")) as websocket:
             await websocket.send('{ "config" : { "sample_rate" : %d } }' % (device.samplerate))
             while time.time() - start < duration or (had_any_text  and time.time() - last_partial < 5) :
                 data = await audio_queue.get()
