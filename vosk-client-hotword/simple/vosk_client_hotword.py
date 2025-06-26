@@ -12,7 +12,7 @@ from eff_word_net.audio_processing import Resnet50_Arc_loss
 from eff_word_net.engine import HotwordDetector
 from eff_word_net import samples_loc
 from eff_word_net.streams import SimpleMicStream
-from vosk import Model, KaldiRecognizer
+# from vosk import Model, KaldiRecognizer
 import pathlib
 
 q = queue.Queue()

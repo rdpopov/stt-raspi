@@ -30,6 +30,7 @@ install_python_only:
 
 install_vosk_only:
 	pip3.9 install vosk
+	pip3.9 install websockets
 	[[ -d ~/.local/share/vosk/models ]] || mkdir -p ~/.local/share/vosk/models
 	[[ -e ~/.local/share/vosk/models/vosk-model-small-en-us-0.15.zip ]] || wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip -P ~/.local/share/vosk/models/
 	[[ -d ~/.local/share/vosk/models/vosk-model-small-en-us-0.15 ]] || unzip -o ~/.local/share/vosk/models/vosk-model-small-en-us-0.15.zip -d ~/.local/share/vosk/models/
@@ -41,6 +42,7 @@ install_eff_word_only:
 	pip3.9 install pyaudio
 	pip3.9 install sounddevice typer
 	pip3.9 install tflite tflite-runtime
+	pip3.9 install websockets
 	pip3.9 install EfficientWord-Net
 	# Quick Fix for EfficientWord-Net error
 	[[ -e ~/.local/lib/python3.9/site-packages/eff_word_net/streams.py ]] && sed -i 's/np.frombuffer(mic_stream.read(CHUNK),dtype=np.int16)/np.frombuffer(mic_stream.read(CHUNK, False),dtype=np.int16)/g' ~/.local/lib/python3.9/site-packages/eff_word_net/streams.py

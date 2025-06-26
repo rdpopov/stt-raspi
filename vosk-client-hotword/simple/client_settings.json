@@ -1,9 +1,9 @@
 {
-    "debug" : 0,
+    "debug" : 1,
     "hotword_threshold" : 0.6,
-    "relaxation_time" : 2,
+    "relaxation_time" : 10,
     "hotword" : "mycroft",
     "hotword_refference_file" : "~/.local/lib/python3.9/site-packages/eff_word_net/sample_refs/mycroft_ref.json",
-    "server" : "ws://localhost:2700",
+    "server" : "ws://172.28.71.37:2700",
     "sample_rate_to_server" : 16000
 }
